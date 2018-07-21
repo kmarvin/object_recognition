@@ -87,10 +87,12 @@ boxshade=plain
 %	INTRODUCTION
 %----------------------------------------------------------------------------------------
 \headerbox{Problem Definition}{name=introduction,column=0,row=0, span=3}{
-Our project compares two state-of-the art approaches towards the detection of traffic signs in color images. The first approach uses a linear classifier, more precisely a support vector machine (SVM), based on Histogram of oriented gradients (HOG) features. The second approach employs a recurrent neural network (RNN). Our training set was made available by the University of Bochum in the context of a traffic sign detection competition in 2013 \cite{Houben-IJCNN-2013}. It consists of 900 training images which we split into 600 images for training and used the remaining 300 images for testing.
+Our project compares two state-of-the art approaches towards the detection of traffic signs in color images. The first approach uses a linear classifier, more precisely a support vector machine (SVM), based on Histogram of oriented gradients (HOG) features. The second approach employs a region based convolutional neural network (R-CNN). Our training set was made available by the University of Bochum in the context of a traffic sign detection competition in 2013 \cite{Houben-IJCNN-2013}. It comprises 900 images (1360
+$\times$ 800 pixels) containing 1206 traffic signs. In addition, the image sections containing only the traffic signs and a CSV file containing ground truth information (location
+of the traffic signs within the images) are provided.
 
 \begin{center}
-\includegraphics[width=1.\textwidth]{ex_imgs_small.png}
+\includegraphics[width=0.6\textwidth]{ex_imgs_small.png}
 \end{center}
 
 }
@@ -105,12 +107,14 @@ Our project compares two state-of-the art approaches towards the detection of tr
 {
 \textbf{Data Preprocessing}
 \begin{itemize}
+	\setlength\itemsep{0em}
 	\item Preparation of positive image patches ($30 \times 30$ pixels) showing traffic signs.
 	\item Preparation of negative image patches ($30 \times 30$ pixels) showing something that is not a sign. 
 \end{itemize}
 
 \textbf{Feature extraction}
 \begin{itemize}
+	\setlength\itemsep{0em}
 	\item Extraction of HOG features from the positive and negative image patches using a HOG implementation from scikit \cite{scikithog}.
 \end{itemize}
 
@@ -128,14 +132,16 @@ Our project compares two state-of-the art approaches towards the detection of tr
 
 \textbf{Training}
 \begin{itemize}
+	\setlength\itemsep{0em}
 	\item Fit the SVM to the prepared training data.
-	\item Hard negative mining: apply the trained SVM to some of the training images (at different scales). Each falsely detected patch is taken and explicitly added as a negative example to the training set.
+	\item Hard negative mining: apply the trained SVM to some of the training images - obtained with a sliding window of $30 \times 30$ pixels size and a step size of $10$ pixels at different scales. Each falsely detected patch is taken and explicitly added as a negative example to the training set.
 	\item Fit the SVM using the enlarged training data.
 \end{itemize}
 
 \textbf{Detection of traffic signs in an image}
 \begin{itemize}
-	\item Slide a window across the image at different scales and obtain a prediction for every image section from the SVM.
+	\setlength\itemsep{0em}
+	\item Slide a window of $30 \times 30$ pixels size with a predefined step size (here: $5$ pixels) across the image at different scales and obtain a prediction for every image section from the SVM.
 \end{itemize}
 
 }
@@ -156,13 +162,22 @@ Our project compares two state-of-the art approaches towards the detection of tr
 %----------------------------------------------------------------------------------------
 %	MEASUREMENT SETUP
 %----------------------------------------------------------------------------------------
-\headerbox{Approach 2: RCNN}{name=application,span=2,column=0,below=instruments}{ 
+\headerbox{Approach 2: R-CNN}{name=application,span=2,column=0,below=instruments}{ 
 \textbf{Data Preprocessing}
+
+\begin{minipage}{0.3\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{data_hist}
+\end{minipage}
+\hfill
+\begin{minipage}{0.65\textwidth}
+\centering
 \begin{itemize}
 \item Create negative image patches by taking samples from traffic scenes without signs
 \item Create train and test dataloader with following partition
 \end{itemize}
-\includegraphics[width=0.35\linewidth]{data_hist.png}
+\end{minipage}
+
 
 \textbf{Network}
 \begin{itemize}
@@ -189,14 +204,23 @@ When $S \geq 0.6$, the ground truth sign is considered as detected. Finally we r
 \includegraphics[width=0.7\linewidth]{test144_wb_predboxes2.png}
 \end{minipage}
 
-}
+\textbf{Result}: The amount of correctly found traffic signs on 30 images from the train respectively test set obtained with and without HNM is shown in the following table. 
 
+\centering
+\small
+\begin{tabular}{ l | r r }
+  &  train acc & test acc \\ \toprule
+  w/o HNM & 93.05 \% & 89.17 \% \\
+  w HNM & 85.56 \% & 79.17 \% \\
+\end{tabular}
+
+}
 
 
 %----------------------------------------------------------------------------------------
 %	CALIBRATION
 %----------------------------------------------------------------------------------------
-\headerbox{Results RNN}{name=calibration,column=2,below=conclusion}{
+\headerbox{Results R-CNN}{name=calibration,column=2,below=conclusion}{
 \begin{minipage}{\textwidth}
 \centering
 \includegraphics[width=0.75\linewidth]{loss}
@@ -214,6 +238,14 @@ When $S \geq 0.6$, the ground truth sign is considered as detected. Finally we r
 
 }
 
+
+\headerbox{Comparison}{name=comparison,span=2,column=0,below=application}{ 
+\textbf{Comparison}
+
+The network of course is much faster when it comes to classify if something is a traffic sign or not. The downside is that the selective search algorithm takes much time to define interesting regions.\\
+From accuracy perspective ...
+
+}
 %----------------------------------------------------------------------------------------
 %	REFERENCES
 %----------------------------------------------------------------------------------------
