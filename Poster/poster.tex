@@ -52,7 +52,7 @@ citestyle=numeric
 {\includegraphics[height=1.1\textheight]{background}};
 \end{tikzpicture}
 }
-\definecolor{BGcolour}{RGB}{200,200,200}
+\definecolor{BGcolour}{RGB}{220,220,220}
 \begin{poster}{
 grid=false,
 borderColor=bordercol, % Border color of content boxes
@@ -201,8 +201,8 @@ When $S \geq 0.6$, the ground truth sign is considered as detected. Finally we r
 
 \begin{minipage}{\textwidth}
 \centering
-\includegraphics[width=0.7\linewidth]{test144_wb_predboxes2.png}
-\end{minipage}
+\includegraphics[width=0.65\linewidth]{test144_wb_predboxes2.png}
+\end{minipage}\\
 
 \textbf{Result}: The amount of correctly found traffic signs on 30 images from the train respectively test set obtained with and without HNM is shown in the following table. 
 
@@ -210,8 +210,8 @@ When $S \geq 0.6$, the ground truth sign is considered as detected. Finally we r
 \small
 \begin{tabular}{ l | r r }
   &  train acc & test acc \\ \toprule
-  w/o HNM & 93.05 \% & 89.17 \% \\
-  w HNM & 85.56 \% & 79.17 \% \\
+  w/o HNM & 93.05, 95.0\% & 89.17, 99.17\% \\
+  w HNM & 85.56, 86.39\%  & 79.17, 91.67 \% \\
 \end{tabular}
 
 }
@@ -223,17 +223,19 @@ When $S \geq 0.6$, the ground truth sign is considered as detected. Finally we r
 \headerbox{Results R-CNN}{name=calibration,column=2,below=conclusion}{
 \begin{minipage}{\textwidth}
 \centering
-\includegraphics[width=0.75\linewidth]{loss}
-\includegraphics[width=0.75\linewidth]{acc}
+\includegraphics[width=0.8\linewidth]{loss_acc}
 \end{minipage}
 
 \begin{itemize}
+\setlength\itemsep{0em}
+\item used two convolution layers with ReLU activation function followed by fully connected layers.
 \item Selective Search to find interesting regions
 	\begin{itemize}
-	\item parameter: scale=300 and sigma=0.8
+	\item parameter: scale=250 and sigma=0.9
 	\end{itemize}
 \item Run network with every region to get signs
-\item Same measurement as in SVM approach to find positive results
+\item Use $S > 0.5$ since the regions are selected with the selective search algorithm
+\item Since the selective search algorithm often couldn't find the correct regions and the network had issues to work with the found regions, the accuracy is just 32\% for traffic scene images
 \end{itemize}
 
 }
@@ -242,8 +244,8 @@ When $S \geq 0.6$, the ground truth sign is considered as detected. Finally we r
 \headerbox{Comparison}{name=comparison,span=2,column=0,below=application}{ 
 \textbf{Comparison}
 
-The network of course is much faster when it comes to classify if something is a traffic sign or not. The downside is that the selective search algorithm takes much time to define interesting regions.\\
-From accuracy perspective ...
+The network of course is much faster when it comes to classify if something is a traffic sign or not. The downside is that the selective search algorithm takes much time to define interesting regions. Since we have to use a sliding window in the HOG approach it takes some time to find the regions of traffic signs.\\
+From accuracy perspective the HOG approach gives convincing results for finding traffic signs. The selective search algorithm couldn't always find all traffic signs in the images and the network had some issues to work with the regions found by the selective search algorithm which explains the surprisingly bad performance.
 
 }
 %----------------------------------------------------------------------------------------
