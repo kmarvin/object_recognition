@@ -247,21 +247,21 @@ If $S(P,G) \geq 0.5$ for any predicted bounding box $P$, the ground truth sign $
 In addition, a measure for the amount signs detected erroneously - i.e. the false positive rate - is needed.  Therefore, we assess the fraction of predicted bounding boxes that have zero overlap with any of the ground truth bounding boxes. By computing $1-$ the false positive rate we yield the detection precision. 
 
 \pagebreak
-\section{Second Approach: RNN \small{(Marvin)}}
+\section{Second Approach: R-CNN \small{(Marvin)}}
 
 In the second approach we created a R-CNN to detect traffic signs in images. For this we first find all interesting regions in an image with the selective search algorithm and then use a CNN network to classify if there is an image in this region or not.
 
-\subsubsection{Data preprocessing}
+\subsection{Data preprocessing}
 
-Before training the CNN we need to do some data preprocessing for this approach. The CNN will train and test with the help of the traffic sign images, classified to different types of signs by the creators of the dataset. Since we just want to distinguish between "no sign" and "sign", we collect them all together and use them as one single class of objects.\\Since the used dataset just offer traffic signs and no \textit{negative} training samples we need to create them. Similar like in the first approach, we filtered out all the traffic scene images without any traffic sign present. After that we took 32x32 parts from different images in random locations of the image. We collected 1000 negative samples through this approach.\\\\
+Before training the CNN we need to do some data preprocessing for this approach. The CNN will train and test with the help of the traffic sign images, classified to different types of signs by the creators of the dataset. Since we just want to distinguish between "no sign" and "sign", we collect them all together and use them as one single class of objects.\\Since the used dataset just offer traffic signs and no \textit{negative} training samples we need to create them. Similar like in the first approach, we filtered out all the traffic scene images without any traffic sign present. After that we took 32x32 parts from different images in random locations of the image. We collected 1000 negative samples through this approach.\\
 
 \textbf{Improvement proposal:}\\
 With more time left or a bigger group size there are several possible steps to improve the data preprocessing. For example as you can see in figure \ref{fig:data_hist} some traffic signs are less represented than others. To do something about this you could apply transformations on the images to rotate or tilt this traffic sign.\\
 Also the collection of negative samples can be improved. For example you can collect these images more targeted like collect more shapes which look like signs but aren't or collect just a fraction of a sign. Also you can collect bigger pictures than 32x32 images and scale it down after that.
 
-\subsubsection{Dataset creation}
+\subsection{Dataset creation}
 
-With the preprocessed data we then create a dataset of these images. To make sure we have every traffic sign type in both the train and the test data, we split the images of every type in two parts where 0.3\% are test data and the rest train data. The results you can see in figure \ref{fig:data_hist} where the blue columns show the train data and the orange columns the test data. With this data we created two datasets for training and testing. For both all the images get resized to 32x32x3. One row in the finish dataset then looks like this: \textit{\{'image': image, 'id': sign_id, 'folder': image_folder\}}. The keys of the dictionary are self explanatory.
+With the preprocessed data we then create a dataset of these images. To make sure we have every traffic sign type in both the train and the test data, we split the images of every type in two parts where 0.3\% are test data and the rest train data. The results you can see in figure \ref{fig:data_hist} where the blue columns show the train data and the orange columns the test data. With this data we created two datasets for training and testing. For both all the images get resized to 32x32x3. One row in the finish dataset then looks like this: \{\textit{'image': image, 'id': sign-id, 'folder': image-folder}\}. The keys of the dictionary are self explanatory.
 
 \begin{figure}[htbp] 
   \centering
@@ -270,7 +270,7 @@ With the preprocessed data we then create a dataset of these images. To make sur
   \label{fig:data_hist}
 \end{figure}
 
-\subsubsection{CNN}
+\subsection{CNN}
 
 TODO: CNN Basics\\\\
 
@@ -287,7 +287,7 @@ To train the network we used the CrossEntropyLoss function. Since the output of 
   \label{fig:loss_acc}
 \end{figure}
 
-\subsubsection{Selective search}
+\subsection{Selective search}
 
 TODO: selective search basic\\\\
 
@@ -300,7 +300,7 @@ Since we want to detect traffic signs in an image we first need to get some regi
   \label{fig:selective_search_example}
 \end{figure}
 
-\subsubsection{Testing}
+\subsection{Testing}
 
 To get an accuracy of our traffic sign detector, we need to run all the found interesting regions in an image with our trained CNN. Like in the creation of datasets all of the regions need to be resized to a size of 32x32x3. After all regions of the wanted images are classified we need to examine how good our detection with the R-CNN works. For this we took the ground truth data and computed the Jaccard similarity for all the bounding boxes in the ground truth data and the regions which were classified as a traffic sign. A successful detection is then a similarity $\geq 0.5$. With this measurement the R-CNN gets an accuracy of just 32\%. This result is not really good, why is described in the discussion later on.
 
@@ -320,7 +320,7 @@ The average detection performance measured by recall, precision and false positi
       \multicolumn{3}{c}{\textbf{test acc}} \\
     & recall & precision & false positives & recall & precision & false positives \\ \toprule
     \textbf{w/o HNM} & 95.00\% & 15,09\% & 84,91\% & 99,17\% &6,29\% & 93,71\% \\
-    \textbf{HNM}  & 84,73\% & 56,54\% & 43,46\% & 91,67\% & & 11.6\% \\
+    \textbf{HNM}  & 84,73\% & 56,54\% & 43,46\% & 96,67\% & 51,11 & 48,99\% \\
   \end{tabular}
   \label{tab:perf}
 \end{table}
@@ -431,7 +431,7 @@ Finally, we wanted to observe how the sliding window's step size during detectio
 \begin{figure}[H]
 \centering
   \includegraphics[width=0.5\linewidth]{step_performance_jaccthres0-5}
-  \caption{Detection performance measured as recall on 30 randomly chosen images from the training set versus the step size of the sliding window used for detection.}}
+  \caption{Detection performance measured as recall on 30 randomly chosen images from the training set versus the step size of the sliding window used for detection.}
   \label{fig:step_perf}
 \end{figure}
 
