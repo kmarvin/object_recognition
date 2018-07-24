@@ -239,11 +239,12 @@ We expect a significant improvement when training with Hard Negative Mining as w
 For detection of traffic signs in a given image we slide a window of size $30 \times 30$ pixels across the image at different scales - here we also used an image pyramid with  scale factor $\sqrt(2)^i$ where $i = 0,...,-5$ - and obtain a prediction for every image section from the SVM. If the thereby received regions possibly showing a traffic sign are obtained from another than the original scale of the image these are back computed to the original image's size. As a result we finally obtain a list of predicted bounding boxes relating to the original input image.
 
 \subsubsection{Performance Measure} \label{ssec:perf}
-For a quantitative measure of performance each predicted bounding box $P$ is compared against every ground truth bounding box $G$ by means of the Jaccard similarity, which is defined as the intersection over union of the two bounding boxes: 
+For a quantitative measure of the detection performance each predicted bounding box $P$ is compared against every ground truth bounding box $G$ by means of the Jaccard similarity, which is defined as the intersection over union of the two bounding boxes: 
 \begin{align*}
 	S(P,G) = \frac{|P \cap G|}{|P \cup G|}
 \end{align*}
-If $S(P,G) \geq 0.6$ for any predicted bounding box $P$, the ground truth sign $G$ is considered as detected. In the end, we record the fraction of detected ground truth signs in all images. 
+If $S(P,G) \geq 0.5$ for any predicted bounding box $P$, the ground truth sign $G$ is considered as detected. In the end, we record the fraction of detected ground truth signs in all images. \\
+In addition, a measure for the amount signs detected erroneously - i.e. the false positive rate - is needed. Therefore, we assess the fraction of predicted bounding boxes that have zero overlap with any of the ground truth bounding boxes. 
 
 \pagebreak
 \section{Second Approach: RNN \small{(Marvin)}}
@@ -256,13 +257,28 @@ The average detection performance on 30 randomly chosen images from the training
 
 \begin{table}[H]
 \centering
-\caption{Performance on the train respectively test set obtained with and without HNM. For training and detection a sliding window of $30 \times 30$ pixels was used. The window's step size was $10$ pixels for training and $5$ pixels for detection.}
+\caption{Detection performance and false positive rate on the train respectively test set obtained with and without HNM. For training and detection a sliding window of $30 \times 30$ pixels was used. The window's step size was $10$ pixels for training and $5$ pixels for detection.}
+  \begin{tabular}{l| c c c c}
+  	  & 
+      \multicolumn{2}{c}{\textbf{train acc}} &
+      \multicolumn{2}{c}{\textbf{test acc}} \\
+    & performance & false positives & performance & false positives \\ \toprule
+    \textbf{w/o HNM} & 95.0\% & 84,91\% & 99,17\% & 93,71\% \\
+    \textbf{HNM} & 86,39\% & 11.6\% & 91,67\% & 11.6\% \\
+  \end{tabular}
+\end{table}
+
+
+
+\begin{table}[H]
+\centering
+\caption{Detection performance and false positive rate on the train respectively test set obtained with and without HNM. For training and detection a sliding window of $30 \times 30$ pixels was used. The window's step size was $10$ pixels for training and $5$ pixels for detection.}
 \label{tab:perf}
 \small
 \begin{tabular}{ l | r r }
   &  train acc & test acc \\ \toprule
-  w/o HNM & 93.05 \% & 89.17 \% \\
-  w HNM & 85.56 \% & 79.17 \% \\
+  w/o HNM & 93.05,95.0 \% & 89.17, 99.17 \% \\
+  w HNM & 85.56, 86,39 \% & 79.17,91,67 \% \\
 \end{tabular}
 \end{table}
 
@@ -433,6 +449,23 @@ To sum up the first approach, one can say that HOG features learned by a SVM are
 41 = restriction ends (overtaking) (other)\\
 42 = restriction ends (overtaking (trucks)) (other)\\
 
+\subsection{Appendix B: Requirements}
+As programming language python 3.6 was used. The following modules are needed to execute the code:
+\begin{itemize}
+	\item os
+	\item numpy
+	\item math
+	\item matplotlib
+	\item imageio
+	\item random
+	\item seaborn
+	\item sklearn
+	\item skimage
+	\item scipy
+	\item pandas
+	\item selectivesearch
+	\item torch
+\end{itemize}
 
 % ----------------------------------------------------------------------------------------------------------
 % Literatur
