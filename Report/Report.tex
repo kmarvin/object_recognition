@@ -243,8 +243,8 @@ For a quantitative measure of the detection performance each predicted bounding 
 \begin{align*}
 	S(P,G) = \frac{|P \cap G|}{|P \cup G|}
 \end{align*}
-If $S(P,G) \geq 0.5$ for any predicted bounding box $P$, the ground truth sign $G$ is considered as detected. In the end, we record the fraction of detected ground truth signs in all images. \\
-In addition, a measure for the amount signs detected erroneously - i.e. the false positive rate - is needed. Therefore, we assess the fraction of predicted bounding boxes that have zero overlap with any of the ground truth bounding boxes. 
+If $S(P,G) \geq 0.5$ for any predicted bounding box $P$, the ground truth sign $G$ is considered as detected. In the end, we record the fraction of detected ground truth signs in all images (recall). \\
+In addition, a measure for the amount signs detected erroneously - i.e. the false positive rate - is needed.  Therefore, we assess the fraction of predicted bounding boxes that have zero overlap with any of the ground truth bounding boxes. By computing $1-$ the false positive rate we yield the detection precision. 
 
 \pagebreak
 \section{Second Approach: RNN \small{(Marvin)}}
@@ -253,34 +253,24 @@ In addition, a measure for the amount signs detected erroneously - i.e. the fals
 \section{Results}
 \subsection{First Approach \small{(Daniela)}}
 
-The average detection performance on 30 randomly chosen images from the training respectively test set is reported in Table \ref{tab:perf}. Contrary to our expectations the accuracy seems to decrease when training the SVM with HNM. However, when having a look at the bounding box predictions of the SVM trained with respectively without HNM, which are presented in Figure \ref{fig:compar}, one can see that Hard Negative Mining significantly lowers the false positive rate. On the left image both ground truth bounding boxes are detected, however there is a large amount of false positives. In the right image the second ground truth bounding box is not found, but the false positive rate is much lower. Unfortunately the amount of false positives is not taken into account by the performance measure we used. Thus we nevertheless assess Hard Negative Mining as an improvement and keep applying it when training our classifier.
+The average detection performance measured by recall, precision and false positive rate on 30 randomly chosen images from the training respectively test set is reported in Table \ref{tab:perf}. Contrary to our expectations the prediction accuracy (recall) decreases when training the SVM with HNM. However, from precision and false positive values or when having a look at the bounding box predictions of the SVM trained with respectively without HNM, which are presented in Figure \ref{fig:compar}, one can see that Hard Negative Mining significantly lowers the false positive rate. On the left image both ground truth bounding boxes are detected, however there is a large amount of false positives. In the right image the second ground truth bounding box is not found, but the false positive rate is much lower. Due to the a better precision respectively lower false positive rate, we nevertheless assess Hard Negative Mining as an improvement and keep applying it when training our classifier.
 
 \begin{table}[H]
 \centering
-\caption{Detection performance and false positive rate on the train respectively test set obtained with and without HNM. For training and detection a sliding window of $30 \times 30$ pixels was used. The window's step size was $10$ pixels for training and $5$ pixels for detection.}
-  \begin{tabular}{l| c c c c}
-  	  & 
-      \multicolumn{2}{c}{\textbf{train acc}} &
-      \multicolumn{2}{c}{\textbf{test acc}} \\
-    & performance & false positives & performance & false positives \\ \toprule
-    \textbf{w/o HNM} & 95.0\% & 84,91\% & 99,17\% & 93,71\% \\
-    \textbf{HNM} & 86,39\% & 11.6\% & 91,67\% & 11.6\% \\
-  \end{tabular}
-\end{table}
-
-
-
-\begin{table}[H]
-\centering
-\caption{Detection performance and false positive rate on the train respectively test set obtained with and without HNM. For training and detection a sliding window of $30 \times 30$ pixels was used. The window's step size was $10$ pixels for training and $5$ pixels for detection.}
-\label{tab:perf}
+\caption{Recall, precision and false positive rate on the train respectively test set obtained with and without HNM. For training and detection a sliding window of $30 \times 30$ pixels was used. The window's step size was $10$ pixels for training and $5$ pixels for detection.}
 \small
-\begin{tabular}{ l | r r }
-  &  train acc & test acc \\ \toprule
-  w/o HNM & 93.05,95.0 \% & 89.17, 99.17 \% \\
-  w HNM & 85.56, 86,39 \% & 79.17,91,67 \% \\
-\end{tabular}
+  \begin{tabular}{l | c c c c c c}
+  	  & 
+      \multicolumn{3}{c}{\textbf{train acc}} &
+      \multicolumn{3}{c}{\textbf{test acc}} \\
+    & recall & precision & false positives & recall & precision & false positives \\ \toprule
+    \textbf{w/o HNM} & 95.00\% & 15,09\% & 84,91\% & 99,17\% &6,29\% & 93,71\% \\
+    \textbf{HNM}  & 84,73\% & 56,54\% & 43,46\% & 91,67\% & & 11.6\% \\
+  \end{tabular}
+  \label{tab:perf}
 \end{table}
+
+
 
 \begin{figure}[H]
 \begin{minipage}{0.48\textwidth}
@@ -385,24 +375,26 @@ Finally, we wanted to observe how the sliding window's step size during detectio
 
 \begin{figure}[H]
 \centering
-  \includegraphics[width=0.5\linewidth]{step_performance}
-  \caption{Detection performance on 30 randomly chosen images from the training set versus the step size of the sliding window used for detection.}}
+  \includegraphics[width=0.5\linewidth]{step_performance_jaccthres0-5}
+  \caption{Detection performance measured as recall on 30 randomly chosen images from the training set versus the step size of the sliding window used for detection.}}
   \label{fig:step_perf}
 \end{figure}
 
-
+\pagebreak
 \subsection{Second Approach \small{(Marvin)}}
 
 \pagebreak
 \section{Discussion}
-To sum up the first approach, one can say that HOG features learned by a SVM are very well suited to detect traffic signs in color images. By the use of Hard Negative Mining the false positive rate can be lowered significantly, however, one looses some accuracy at the same time. Generally, the approach is very sensitive to the setting of the hyperparameters especially towards the step size of the sliding window for detection. The smaller the step size the better the detection performance - at the price to a much higher computational effort. It could thus be an improvement to use region of interest extraction instead of a sliding window, like for instance selective search, which was basically done in the second approach by the R-CNN. 
+To sum up the first approach, one can say that HOG features learned by a SVM are very well suited to detect traffic signs in color images. By the use of Hard Negative Mining the false positive rate can be lowered significantly, however, one looses some accuracy at the same time. An interesting idea could be to combine the predictions of a simply trained SVM with the ones from a HNM-trained SVM. Generally, the approach is very sensitive to the setting of the hyperparameters especially towards the step size of the sliding window for detection. The smaller the step size the better the detection performance - at the price to a much higher computational effort. It could thus be an improvement to use region of interest extraction instead of a sliding window, like for instance selective search. Another idea could be to include some image patches slightly overlapping with a traffic sign in the negative samples such that the classifier would get less easily confused by objects partly being similar to traffic signs. This could possibly further reduce the amount of false positive predictions. \\
+
+\color{red} marvin \color{black}\\
+
+In comparison, the SVM based on HOG features provides more convincing results than the R-CNN. Regarding computational effort the R-CNN is faster with the main bottleneck being the selective search algorithm. Faster R-CNNs provide one solution to this problem. They combine a region proposal network (RPN) with a R-CNN. The RPN is a fully convolutional network which is trained end-to-end to generate valuable region proposals, which are then used by the R-CNN for detection \cite{DBLP:journals/corr/RenHG015}. 
 
 
-\begin{itemize}
-	\item je nachdem welches measure genommen werden falsch positive halt ignoriert...außerdem könnte man IOU>=0.5 auch schon nehmen.
-\end{itemize}
 
 
+\pagebreak
 \section{Appendix}
 \subsection{Appendix A}
 0 = speed limit 20 (prohibitory) \\
