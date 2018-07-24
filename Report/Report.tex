@@ -249,6 +249,61 @@ In addition, a measure for the amount signs detected erroneously - i.e. the fals
 \pagebreak
 \section{Second Approach: RNN \small{(Marvin)}}
 
+In the second approach we created a R-CNN to detect traffic signs in images. For this we first find all interesting regions in an image with the selective search algorithm and then use a CNN network to classify if there is an image in this region or not.
+
+\subsubsection{Data preprocessing}
+
+Before training the CNN we need to do some data preprocessing for this approach. The CNN will train and test with the help of the traffic sign images, classified to different types of signs by the creators of the dataset. Since we just want to distinguish between "no sign" and "sign", we collect them all together and use them as one single class of objects.\\Since the used dataset just offer traffic signs and no \textit{negative} training samples we need to create them. Similar like in the first approach, we filtered out all the traffic scene images without any traffic sign present. After that we took 32x32 parts from different images in random locations of the image. We collected 1000 negative samples through this approach.\\\\
+
+\textbf{Improvement proposal:}\\
+With more time left or a bigger group size there are several possible steps to improve the data preprocessing. For example as you can see in figure \ref{fig:data_hist} some traffic signs are less represented than others. To do something about this you could apply transformations on the images to rotate or tilt this traffic sign.\\
+Also the collection of negative samples can be improved. For example you can collect these images more targeted like collect more shapes which look like signs but aren't or collect just a fraction of a sign. Also you can collect bigger pictures than 32x32 images and scale it down after that.
+
+\subsubsection{Dataset creation}
+
+With the preprocessed data we then create a dataset of these images. To make sure we have every traffic sign type in both the train and the test data, we split the images of every type in two parts where 0.3\% are test data and the rest train data. The results you can see in figure \ref{fig:data_hist} where the blue columns show the train data and the orange columns the test data. With this data we created two datasets for training and testing. For both all the images get resized to 32x32x3. One row in the finish dataset then looks like this: \textit{\{'image': image, 'id': sign_id, 'folder': image_folder\}}. The keys of the dictionary are self explanatory.
+
+\begin{figure}[htbp] 
+  \centering
+     \includegraphics[width=0.7\textwidth]{data_hist}
+  \caption{number of traffic signs by id divided by train and test data}
+  \label{fig:data_hist}
+\end{figure}
+
+\subsubsection{CNN}
+
+TODO: CNN Basics\\\\
+
+\textbf{Architecture:}\\
+To classify if there is a traffic sign in one image region we use a CNN. The network consists of two convolutional layers, both have a size of 5x5 where the first outputs 16 filters and the second layer 32. Both layers are follows by an normalization, ReLU and a pooling layer. After the convolutional layers we use fully connected layers to break the output down to two singles values.\\\\
+
+\textbf{Training:}\\
+To train the network we used the CrossEntropyLoss function. Since the output of the network consists of two values, the first should imply that there is no traffic sign in the image and the second one says that there is an image. With the Adam optimizer the accuracy of the network already looks really good after just 15 epochs. As you can see in \ref{fig:loss_acc} we got an accuracy of 94\%.
+
+\begin{figure}[htbp] 
+  \centering
+     \includegraphics[width=0.7\textwidth]{loss_acc}
+  \caption{loss and accuracy of net CNN}
+  \label{fig:loss_acc}
+\end{figure}
+
+\subsubsection{Selective search}
+
+TODO: selective search basic\\\\
+
+Since we want to detect traffic signs in an image we first need to get some regions which we can classify with our CNN. For this reason we use the selective search algorithm which return bounding boxes of interesting regions in an image. While working with the selective search algorithm we noticed some issues with this algorithm. With the two parameters you can adjust, we found no perfect solution to find all the traffic signs in every image. At the end we took parameters where a good amount of traffic signs are represented in the interesting regions (scale=250, sigma=0.9). The network returns a huge amount of interesting regions for which reason we need to filter these regions. For example we just need regions which are in an certain size interval and are nearly quadratic. After this step an output of the selective search algorithm looks for example like in figure \ref{fig:selective_search_example}.
+
+\begin{figure}[htbp] 
+  \centering
+     \includegraphics[width=0.7\textwidth]{selective_search_example}
+  \caption{Example of the selective search algorithm after region filtering. All red rectangles are interesting regions.}
+  \label{fig:selective_search_example}
+\end{figure}
+
+\subsubsection{Testing}
+
+To get an accuracy of our traffic sign detector, we need to run all the found interesting regions in an image with our trained CNN. Like in the creation of datasets all of the regions need to be resized to a size of 32x32x3. After all regions of the wanted images are classified we need to examine how good our detection with the R-CNN works. For this we took the ground truth data and computed the Jaccard similarity for all the bounding boxes in the ground truth data and the regions which were classified as a traffic sign. A successful detection is then a similarity $\geq 0.5$. With this measurement the R-CNN gets an accuracy of just 32\%. This result is not really good, why is described in the discussion later on.
+
 \pagebreak
 \section{Results}
 \subsection{First Approach \small{(Daniela)}}
