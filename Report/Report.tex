@@ -272,7 +272,8 @@ With the preprocessed data we then create a dataset of these images. To make sur
 
 \subsubsection{CNN}
 
-TODO: CNN Basics\\\\
+\textbf{Basics:}\\
+A convolutional neural network (CNN) is artificial neural network which is used to analyzing and classifying images. A CNN consists essentially of filters (convolutional Layer) and aggregation layers (pooling Layer), which repeat alternately. At the end there are one or more fully connected layers to output the probability of different objects the image could represent.\\\\
 
 \textbf{Architecture:}\\
 To classify if there is a traffic sign in one image region we use a CNN. The network consists of two convolutional layers, both have a size of 5x5 where the first outputs 16 filters and the second layer 32. Both layers are follows by an normalization, ReLU and a pooling layer. After the convolutional layers we use fully connected layers to break the output down to two singles values.\\\\
@@ -289,7 +290,7 @@ To train the network we used the CrossEntropyLoss function. Since the output of 
 
 \subsubsection{Selective search}
 
-TODO: selective search basic\\\\
+Selective Search is a region proposal algorithm often used in object detection. It is based on computing hierarchical grouping of similar regions based on color, texture, size and shape compatibility.\\\\
 
 Since we want to detect traffic signs in an image we first need to get some regions which we can classify with our CNN. For this reason we use the selective search algorithm which return bounding boxes of interesting regions in an image. While working with the selective search algorithm we noticed some issues with this algorithm. With the two parameters you can adjust, we found no perfect solution to find all the traffic signs in every image. At the end we took parameters where a good amount of traffic signs are represented in the interesting regions (scale=250, sigma=0.9). The network returns a huge amount of interesting regions for which reason we need to filter these regions. For example we just need regions which are in an certain size interval and are nearly quadratic. After this step an output of the selective search algorithm looks for example like in figure \ref{fig:selective_search_example}.
 
