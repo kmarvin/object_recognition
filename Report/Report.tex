@@ -439,6 +439,23 @@ Finally, we wanted to observe how the sliding window's step size during detectio
 \pagebreak
 \subsection{Second Approach \small{(Marvin)}}
 
+\textbf{Network:}\\
+The first thing we did was to train and test the CNN. The accuracy and loss function are displayed in figure <?>. We can see that the network can identify a traffic sign in approximately 94\% of cases. But we remember that we trained this network with the provided traffic signs of the dataset.\\\\
+
+\textbf{Selective Search:}\\
+Next we tried to get all interesting regions in a traffic scene image to classify each of these regions with our network. Figure <?> shows an example output of this algorithm. We can see, that in this image some traffic signs are recognized and some are not. We tried several parameters for the selective search algorithm but couldn't find a perfect setting to recognize all traffic signs in all images. Keep that in mind when looking at the results of the traffic sign detection.
+
+\textbf{Detection:}\\
+After getting all interesting regions in 40 random images, we classify each region with our CNN. We compared each region classified as traffic sign with the ground truth bounding box. The classification was successful if the two bounding boxes had a jaccard similarity $\geq 0.5$. The proportion of successful found traffic signs in the images are displayes in table <?>.\\
+The results are a little bit surprising considering a CNN which recognized around 94\% of traffic sign images. Next we want to try to explain this phenomenon. 
+\begin{enumerate}
+\item As we saw in the results of the selective search algorithm, some traffic signs weren't even recognized and therefore not recognized which have a negative impact on the results. 
+\item Also we looked at some images that were classified as traffic signs but were not counted as a successful detection. We saw some images which displayed a traffic sign but even with a good proprtion of the sign the jaccard similarity was less than $0.5$.
+\item As we saw in figure <?> some traffic sign images are just underrepresented so that the network couldn't learn them good enough. This can affect the classification.
+\end{enumerate}
+
+With all these points we can explain the surprising bad results for the traffic sign detection with R-CNN's. But of course since simple R-CNN are a older approach there are better solutions to use for this problem. For example Fast R-CNN's and Faster R-CNN's are introduced which improve the region proposal computation. The Faster R-CNN for example introduce the Region Proposal Network which enables nearly cost-free region proposals.
+
 \pagebreak
 \section{Discussion}
 To sum up the first approach, one can say that HOG features learned by a SVM are very well suited to detect traffic signs in color images. By the use of Hard Negative Mining the false positive rate can be lowered significantly, however, one looses some accuracy at the same time. An interesting idea could be to combine the predictions of a simply trained SVM with the ones from a HNM-trained SVM. Generally, the approach is very sensitive to the setting of the hyperparameters especially towards the step size of the sliding window for detection. The smaller the step size the better the detection performance - at the price to a much higher computational effort. It could thus be an improvement to use region of interest extraction instead of a sliding window, like for instance selective search. Another idea could be to include some image patches slightly overlapping with a traffic sign in the negative samples such that the classifier would get less easily confused by objects partly being similar to traffic signs. This could possibly further reduce the amount of false positive predictions. \\
