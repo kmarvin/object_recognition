@@ -1,3 +1,16 @@
+##########################################
+Run HOG-SVM approach
+##########################################
+The data mentioned in the report should be in a folder "data" which must be one folder level up from "svm_hog.ipynb". In the Data folder don't delete the "FullIJCNN2013" folder.
+
+Tree:
+-code_svm
+   -svm_hog.ipynb
+-data
+   -FullIJCNN2013
+      - [images]
+      - gt.txt
+
 
 ##########################################
 Run R-CNN approach
