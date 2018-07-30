@@ -11,6 +11,7 @@ Tree:
       - [images]
       - gt.txt
 
+The code produces images and graphs which are stored in the code_svm folder.
 
 ##########################################
 Run R-CNN approach
